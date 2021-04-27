@@ -1,28 +1,32 @@
-import java.rmi.registry.Registry; 
+import java.io.Serializable;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
-import java.rmi.server.UnicastRemoteObject;
+public class Server implements Serializable{
+	
+	static int portnumber;
+     //String remoteObject ="remoteObject";
+	static String start = "start";
 
-public class Server extends RmiRegistry { 
-   public Server() {} 
-   public static void main(String args[]) { 
-      try { 
-         // Instantiating the implementation class 
-         RmiRegistry obj = new RmiRegistry(); 
+	public static void main(String[] args) {
+		
+		try{
+			if(start.equals(args[0]))
+		    {
+				portnumber = Integer.parseInt(args[1]);
+				
+			}
+			Registry reg = LocateRegistry.createRegistry(portnumber);   //Creates and exports a Registry instance on the local host that accepts requests 
+																		//on the specified port.
+
+         RmiRegistry imp =  new RmiRegistry("C://ServerStorage");
          System.setProperty("java.rmi.server.hostname","127.0.0.1");
-    
-         // Exporting the object of implementation class  
-         // (here we are exporting the remote object to the stub) 
-         HelloInterface stub = (HelloInterface) UnicastRemoteObject.exportObject(obj, 0);  
-         
-         // Binding the remote object (stub) in the registry 
-         Registry registry = LocateRegistry.getRegistry(); 
-         
-         registry.bind("Hello", stub);  
-         System.err.println("Server ready"); 
-      } catch (Exception e) { 
-         System.err.println("Server exception: " + e.toString()); 
-         e.printStackTrace(); 
-      } 
-   } 
-} 
+			reg.bind("remoteObject", imp);
+			System.out.println("Server is ready.");
+			System.out.println(portnumber);
+		}
+		catch(Exception e){
+			System.out.println("Server failed: " + e);
+		}
+	}
+}
