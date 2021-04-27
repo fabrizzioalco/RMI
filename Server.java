@@ -1,29 +1,32 @@
-import java.rmi.Naming;
-import java.rmi.RMISecurityManager;
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
+import java.io.Serializable;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
-import Hello.Hello;
+public class Server implements Serializable{
+	
+	static int portnumber;
+     //String remoteObject ="remoteObject";
+	static String start = "start";
 
-public class Server extends UnicastRemoteObject implements Hello {
-    public Server() throws RemoteException {
-        super();
-    }
+	public static void main(String[] args) {
+		
+		try{
+			if(start.equals(args[0]))
+		    {
+				portnumber = Integer.parseInt(args[1]);
+				
+			}
+			Registry reg = LocateRegistry.createRegistry(portnumber);   //Creates and exports a Registry instance on the local host that accepts requests 
+																		//on the specified port.
 
-    public String sayHello() throws RemoteException {
-        return "Hello World!";
-    }
-
-    public static void main(String args[]) {
-        // Create and install a security manager
-        if (System.getSecurityManager() == null)
-            System.setSecurityManager(new RMISecurityManager());
-        try {
-            // createRegistry(1099);
-            Hello obj = new Server();
-            // Bind this object instance to the name "HelloServer“
-            Naming.rebind("///HelloServer", obj);
-        } catch (Exception e) {
-        }
-    }
+         RmiRegistry imp =  new RmiRegistry("C://ServerStorage");
+         System.setProperty("java.rmi.server.hostname","127.0.0.1");
+			reg.bind("remoteObject", imp);
+			System.out.println("Server is ready.");
+			System.out.println(portnumber);
+		}
+		catch(Exception e){
+			System.out.println("Server failed: " + e);
+		}
+	}
 }
